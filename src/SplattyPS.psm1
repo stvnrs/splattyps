@@ -28,7 +28,7 @@ function Get-SplattedCommand {
         [Alias('sth')]
         [switch]$ShowTypeHint,
 
-        [Parameter(ParameterSetName='Compact')]
+        [Parameter(Mandatory = $true, ParameterSetName='Compact')]
         [Alias('c')]
         [switch]$CompactHashTable,
 
