@@ -7,38 +7,41 @@ schema: 2.0.0
 # Get-SplattedCommand
 
 ## SYNOPSIS
-
 Generate a splatted command invocation for the specified command.
 
 ## SYNTAX
 
+### Regular (Default)
 ```
 Get-SplattedCommand [-Name] <String> [-HashTableName <String>] [-ParameterSet <String>] [-AllParameters]
- [-IncludeCommonParameters] [-EmitScriptBlock] [-ShowTypeHint] [-CompactHashTable] [-ILoveSemiColons]
- [-IndentSize <Int32>] [-IndentLevel <Int32>] [-UseTabs] [-ResolveAlias] [-AssignmentVariableName <String>]
- [<CommonParameters>]
+ [-IncludeCommonParameters] [-EmitScriptBlock] [-ShowTypeHint] [-ILoveSemiColons] [-IndentSize <Int32>]
+ [-IndentLevel <Int32>] [-UseTabs] [-ResolveAlias] [-AssignmentVariableName <String>] [<CommonParameters>]
+```
+
+### Compact
+```
+Get-SplattedCommand [-Name] <String> [-HashTableName <String>] [-ParameterSet <String>] [-AllParameters]
+ [-IncludeCommonParameters] [-EmitScriptBlock] [-CompactHashTable] [-ILoveSemiColons] [-IndentSize <Int32>]
+ [-IndentLevel <Int32>] [-UseTabs] [-ResolveAlias] [-AssignmentVariableName <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-
 Generate a splatted command invocation for the specified command.
 
 ## EXAMPLES
 
 ### Example 1 Get a splatted command
-
-```PowerShell
+```
 $Params = @{
     Name =  #mandatory
 }
 
 Get-SplattedCommand @Params
-PS C:\> 
+PS C:\>
 ```
 
 ### Example 2 Get a splatted command with all parameters
-
-```PowerShell
+```
 PS C:\> Get-SplattedCommand Get-SplattedCommand -AllParameters
 $Params = @{
     Name =                        #mandatory
@@ -59,12 +62,11 @@ $Params = @{
 
 
 Get-SplattedCommand @Params
-PS C:\> 
+PS C:\>
 ```
 
 ### Example 3 Get a splatted command with all parameters and common parameters
-
-```PowerShell
+```
 PS C:\> Get-SplattedCommand Get-SplattedCommand -AllParameters -IncludeCommonParameters
 $Params = @{
     Name =                        #mandatory 
@@ -97,9 +99,9 @@ $Params = @{
 Get-SplattedCommand @Params
 PS C:\>
 ```
-### Example 4 Specify the name of the splattable hashtable
 
-```PowerShell
+### Example 4 Specify the name of the splattable hashtable
+```
 PS C:\> Get-SplattedCommand Get-SplattedCommand -HashTableName 'SplattedParams'
 $SplattedParams = @{
     Name =  #mandatory
@@ -108,9 +110,9 @@ $SplattedParams = @{
 Get-SplattedCommand @SplattedParams
 PS C:\>
 ```
-### Example 5 Assign the result to a variable
 
-```PowerShell
+### Example 5 Assign the result to a variable
+```
 PS C:\> Get-SplattedCommand Get-SplattedCommand -AssignmentVariableName 'Result'
 $Params = @{
     Name =  #mandatory
@@ -121,8 +123,7 @@ PS C:\>
 ```
 
 ### Example 6 Get a splattable command in a script block
-
-```PowerShell
+```
 PS C:\> Get-SplattedCommand Get-SplattedCommand -AssignmentVariableName 'Result' -EmitScriptBlock
 Invoke-Command {
     $Params = @{
@@ -135,8 +136,7 @@ PS C:\>
 ```
 
 ### Example 7 Get a type hint for each parameter
-
-```PowerShell
+```
 PS C:\> Get-SplattedCommand Get-SplattedCommand -ShowTypeHint
 $Params = @{
     Name =  #mandatory System.String
@@ -147,8 +147,7 @@ PS C:\>
 ```
 
 ### Example 8 Specify a parameter set
-
-```PowerShell
+```
 PS C:\> Get-SplattedCommand Get-Help -ParameterSet Online
 $Params = @{
     Online =    #mandatory
@@ -162,14 +161,12 @@ $Params = @{
 }
 
 Get-Help @Params
-PS C:\> 
-
+PS C:\>
 ```
 
 ## PARAMETERS
 
 ### -AllParameters
-
 Include both mandatory and optional paramers.
 
 ```yaml
@@ -185,7 +182,6 @@ Accept wildcard characters: False
 ```
 
 ### -AssignmentVariableName
-
 The name of a variable to assign the result of invoking the command.
 
 ```yaml
@@ -201,12 +197,11 @@ Accept wildcard characters: False
 ```
 
 ### -CompactHashTable
-
 Emit a single line hash table. (Not really a good idea :))
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: (All)
+Parameter Sets: Compact
 Aliases: c
 
 Required: False
@@ -217,7 +212,6 @@ Accept wildcard characters: False
 ```
 
 ### -EmitScriptBlock
-
 Emits a script block.
 
 ```yaml
@@ -233,7 +227,6 @@ Accept wildcard characters: False
 ```
 
 ### -HashTableName
-
 Name of the hash table used for splatting.
 
 ```yaml
@@ -249,7 +242,6 @@ Accept wildcard characters: False
 ```
 
 ### -ILoveSemiColons
-
 If specifed all (non-blank) lines are terminated with a semi-colon.
 
 ```yaml
@@ -265,7 +257,6 @@ Accept wildcard characters: False
 ```
 
 ### -IncludeCommonParameters
-
 Includes common parameters (if the command suport them)
 
 ```yaml
@@ -281,7 +272,6 @@ Accept wildcard characters: False
 ```
 
 ### -IndentLevel
-
 Initial indent level. Default 0.
 
 ```yaml
@@ -297,7 +287,6 @@ Accept wildcard characters: False
 ```
 
 ### -IndentSize
-
 The number of characters for each indent. Default 4 with spaces, default 1 with tabs.
 
 ```yaml
@@ -313,7 +302,6 @@ Accept wildcard characters: False
 ```
 
 ### -Name
-
 Name of the command.
 
 ```yaml
@@ -329,7 +317,6 @@ Accept wildcard characters: False
 ```
 
 ### -ParameterSet
-
 The parameter set to use.
 
 ```yaml
@@ -345,7 +332,6 @@ Accept wildcard characters: False
 ```
 
 ### -ResolveAlias
-
 Emit the command name instead of an alias, if an alias was specified.
 
 ```yaml
@@ -361,12 +347,11 @@ Accept wildcard characters: False
 ```
 
 ### -ShowTypeHint
-
 Emit a type hint for each parameter.
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: (All)
+Parameter Sets: Regular
 Aliases: sth
 
 Required: False
@@ -377,7 +362,6 @@ Accept wildcard characters: False
 ```
 
 ### -UseTabs
-
 Emit Tabs instead of spaces.
 
 ```yaml
