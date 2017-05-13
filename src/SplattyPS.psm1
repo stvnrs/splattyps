@@ -1,19 +1,22 @@
 Set-StrictMode -Version 'Latest'
 
 function Get-SplattedCommand {
-    [CmdletBinding(DefaultParameterSetName='Regular')]
+    [CmdletBinding(DefaultParameterSetName = 'Regular')]
+    [OutputType([string[]])]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]        
-        [string]$Name,
+        [string[]]$Name,
 
+        [Parameter(Position = 1, ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [Alias('htn')]
         [string]$HashTableName = 'Params',
 
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
+        [Alias('avn')]
         [ValidateNotNullOrEmpty()]
-        [Alias('ps')]
-        [string]$ParameterSet,
+        [string]$AssignmentVariableName,
 
         [Alias('All')]
         [switch]$AllParameters,
@@ -24,11 +27,11 @@ function Get-SplattedCommand {
         [Alias('esb')]
         [switch]$EmitScriptBlock,
         
-        [Parameter(ParameterSetName='Regular')]
+        [Parameter(ParameterSetName = 'Regular')]
         [Alias('sth')]
         [switch]$ShowTypeHint,
 
-        [Parameter(Mandatory = $true, ParameterSetName='Compact')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'Compact')]
         [Alias('c')]
         [switch]$CompactHashTable,
 
@@ -45,12 +48,41 @@ function Get-SplattedCommand {
         [Switch]$UseTabs,
 
         [Alias('ra')]
-        [Switch]$ResolveAlias,
-
-        [Alias('avn')]
-        [ValidateNotNullOrEmpty()]
-        [string]$AssignmentVariableName
+        [Switch]$ResolveAlias        
     )
+
+    DynamicParam {
+        $ParameterName = "ParameterSet"        
+
+        if ($PSBoundParameters.ContainsKey('Name')) {
+            
+            if ($PSBoundParameters['Name'].Length -eq 1) {
+                $Command = (Get-Command $Name)
+
+                if ($Command.CommandType -eq 'Alias') {
+                    $Command = (Get-Command $Command.Definition)
+                }
+
+                $ParameterAttribute = New-Object System.Management.Automation.ParameterAttribute
+                $ParameterAttribute.ParameterSetName = "__AllParameterSets"
+                $ParameterAttribute.Mandatory = $false                
+                $Values = $Command.ParameterSets.Name
+        
+                if ($Values) {
+                    $ValidateSet = New-Object 'System.Management.Automation.ValidateSetAttribute' -ArgumentList($Values)            
+                }
+
+                $Attributes = New-Object -Type System.Collections.ObjectModel.Collection[System.Attribute]
+                $Attributes.Add($ParameterAttribute)
+                $Attributes.Add($ValidateSet)
+                $Parameter = New-Object -TypeName System.Management.Automation.RuntimeDefinedParameter($ParameterName, [string], $Attributes)
+                $Parameters = New-Object -TypeName System.Management.Automation.RuntimeDefinedParameterDictionary
+                $Parameters.Add($Parameter.Name, $Parameter)
+        
+                return $Parameters
+            }
+        }
+    }
 
     begin {
         $CommonParamNames = 'Debug', 'Verbose', 'ErrorAction', 'WarningAction', 'InformationAction', 'ErrorVariable', 'WarningVariable', 'InformationVariable', 'OutVariable', 'OutBuffer', 'PipelineVariable', 'WhatIf', 'Confirm'
@@ -75,13 +107,10 @@ function Get-SplattedCommand {
         }
 
         $Assignment = ''
-
-        if ($AssignmentVariableName) {
-            $Assignment = "`$$AssignmentVariableName = "
-        }
     }   
 
     process {
+        $Name 
         $Command = (Get-Command $Name)
 
         if ($Command.CommandType -eq 'Alias') {
@@ -105,6 +134,10 @@ function Get-SplattedCommand {
           
         $Output = @()
         
+        if ($AssignmentVariableName) {
+            $Assignment = "`$$AssignmentVariableName = "
+        }
+
         if ($EmitScriptBlock.IsPresent) {
             $Output += "$($Indent * $IndentLevel)Invoke-Command {"
             $IndentLevel++
@@ -173,5 +206,5 @@ function Get-SplattedCommand {
         }
 
         Write-Output $Output    
-    }    
+    }
 }
