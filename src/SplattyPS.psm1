@@ -356,7 +356,8 @@ function Get-SplattedRunbook {
                 $IndentLevel--
                 $Output += "$($Indent * $IndentLevel)}"
             }
-
+            
+            $Output += ''
             Write-Output $Output        
         }    
     }

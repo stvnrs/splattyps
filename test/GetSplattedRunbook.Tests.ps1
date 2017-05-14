@@ -60,7 +60,8 @@ try {
                     "    }",
                     '}',
                     '',
-                    '$Job = Start-AzureRmAutomationRunbook @Params'
+                    '$Job = Start-AzureRmAutomationRunbook @Params',
+                    ''
                 )
                 
                 $Actual = Get-SplattedRunbook 'example-resource-group' 'example-automation-account' -Name 'RunbookWithParams'
@@ -82,7 +83,8 @@ try {
                     "    }",
                     '}',
                     '',
-                    '$Job = Start-AzureRmAutomationRunbook @Params'
+                    '$Job = Start-AzureRmAutomationRunbook @Params',
+                    ''
                 )
                 
                 $Actual = Get-SplattedRunbook 'example-resource-group' 'example-automation-account' 'RunbookWithParams' -AllParameters
@@ -102,7 +104,8 @@ try {
                     "    }",
                     '}',
                     '',
-                    '$Job = Start-AzureRmAutomationRunbook @Params'
+                    '$Job = Start-AzureRmAutomationRunbook @Params',
+                    ''
                 )
 
                 $Actual = Get-SplattedRunbook -ResourceGroupName 'example-resource-group' -AutomationAccountName 'example-automation-account' -Name 'RunbookWithNoParams'
