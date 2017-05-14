@@ -8,7 +8,7 @@ try {
     $ModuleUnderTest = (resolve-path (join-path $PsScriptRoot  '..\src\SplattyPS.psd1')).Path
     Import-Module  -FullyQualifiedName  $ModuleUnderTest
     
-    Describe 'Get-SplattedCommand' {
+    Describe 'Get-SplattedRunbook' {
         InModuleScope SplattyPS {
             It "When called with a positonal args returns only mandatory params" {
                 $Expected   = @(
@@ -16,10 +16,10 @@ try {
                     '    Name = #mandatory',
                     '}',
                     '',
-                    'Get-SplattedCommand @Params'
+                    'Get-SplattedRunbook @Params'
                 )
 
-                $Actual = Get-SplattedCommand Get-SplattedCommand
+                $Actual = Get-SplattedRunbook Get-SplattedRunbook
                 
                 for ($i = 0; $i -lt $Actual.Count; $i++) {
                     $Actual[$i] | Should Be $Expected[$i]   
@@ -32,10 +32,10 @@ try {
                     '    Name = #mandatory',
                     '}',
                     '',
-                    'Get-SplattedCommand @Params'
+                    'Get-SplattedRunbook @Params'
                 )
 
-                $Actual = Get-SplattedCommand -Name 'Get-SplattedCommand'
+                $Actual = Get-SplattedRunbook -Name 'Get-SplattedRunbook'
                 
                 for ($i = 0; $i -lt $Actual.Count; $i++) {
                     $Actual[$i] | Should Be $Expected[$i]   
@@ -59,10 +59,10 @@ try {
                     '    ResolveAlias =               #optional',
                     '}',
                     '',
-                    'Get-SplattedCommand @Params'
+                    'Get-SplattedRunbook @Params'
                 )
 
-                $Actual = Get-SplattedCommand -Name 'Get-SplattedCommand' -AllParameters
+                $Actual = Get-SplattedRunbook -Name 'Get-SplattedRunbook' -AllParameters
                 
                 for ($i = 0; $i -lt $Actual.Count; $i++) {
                     $Actual[$i] | Should Be $Expected[$i]   
@@ -75,10 +75,10 @@ try {
                     '    Name = #mandatory',
                     '}',
                     '',
-                    'Get-SplattedCommand @SplattParams'
+                    'Get-SplattedRunbook @SplattParams'
                 )
 
-                $Actual = Get-SplattedCommand -name 'Get-SplattedCommand' -HashTableName 'SplattParams'
+                $Actual = Get-SplattedRunbook -name 'Get-SplattedRunbook' -HashTableName 'SplattParams'
                 
                 for ($i = 0; $i -lt $Actual.Count; $i++) {
                     $Actual[$i] | Should Be $Expected[$i]   
@@ -92,11 +92,11 @@ try {
                     '        Name = #mandatory',
                     '    }',
                     '',
-                    '    Get-SplattedCommand @Params',
+                    '    Get-SplattedRunbook @Params',
                     '}'
                 )
 
-                $Actual = Get-SplattedCommand -name 'Get-SplattedCommand' -EmitScriptBlock
+                $Actual = Get-SplattedRunbook -name 'Get-SplattedRunbook' -EmitScriptBlock
 
                 for ($i = 0; $i -lt $Actual.Count; $i++) {
                     $Actual[$i] | Should Be $Expected[$i]   
@@ -110,10 +110,10 @@ try {
                     '    Name = ;#mandatory',
                     '}',
                     '',
-                    'Get-SplattedCommand @Params;'
+                    'Get-SplattedRunbook @Params;'
                 )
 
-                $Actual = Get-SplattedCommand -name 'Get-SplattedCommand' -ILoveSemiColons
+                $Actual = Get-SplattedRunbook -name 'Get-SplattedRunbook' -ILoveSemiColons
 
                 for ($i = 0; $i -lt $Actual.Count; $i++) {
                     $Actual[$i] | Should Be $Expected[$i]   
@@ -126,10 +126,10 @@ try {
                     '    Name = #mandatory System.String[]',
                     '}',
                     '',
-                    'Get-SplattedCommand @Params'
+                    'Get-SplattedRunbook @Params'
                 )
 
-                $Actual = Get-SplattedCommand -name 'Get-SplattedCommand' -ShowTypeHint
+                $Actual = Get-SplattedRunbook -name 'Get-SplattedRunbook' -ShowTypeHint
 
                 for ($i = 0; $i -lt $Actual.Count; $i++) {
                     $Actual[$i] | Should Be $Expected[$i]   
@@ -140,10 +140,10 @@ try {
                 $Expected   = @(
                     '$Params = @{Name = ;}',
                     '',
-                    'Get-SplattedCommand @Params'
+                    'Get-SplattedRunbook @Params'
                 )
 
-                $Actual = Get-SplattedCommand -name 'Get-SplattedCommand' -CompactHashTable
+                $Actual = Get-SplattedRunbook -name 'Get-SplattedRunbook' -CompactHashTable
 
                 for ($i = 0; $i -lt $Actual.Count; $i++) {
                     $Actual[$i] | Should Be $Expected[$i]   
@@ -154,10 +154,10 @@ try {
                 $Expected   = @(
                     '$Params = @{Name = ;  HashTableName = ;  AssignmentVariableName = ;  AllParameters = ;  IncludeCommonParameters = ;  EmitScriptBlock = ;  ShowTypeHint = ;  ILoveSemiColons = ;  IndentSize = ;  IndentLevel = ;  UseTabs = ;  ResolveAlias = ;}',
                     '',
-                    'Get-SplattedCommand @Params'
+                    'Get-SplattedRunbook @Params'
                 )
 
-                $Actual = Get-SplattedCommand -name 'Get-SplattedCommand' -CompactHashTable -AllParameters
+                $Actual = Get-SplattedRunbook -name 'Get-SplattedRunbook' -CompactHashTable -AllParameters
 
                 for ($i = 0; $i -lt $Actual.Count; $i++) {
                     $Actual[$i] | Should Be $Expected[$i]   
@@ -170,10 +170,10 @@ try {
                     '    Name = #mandatory',
                     '}',
                     '',
-                    'Get-SplattedCommand @Params'
+                    'Get-SplattedRunbook @Params'
                 )
 
-                $Actual = 'Get-SplattedCommand' | Get-SplattedCommand
+                $Actual = 'Get-SplattedRunbook' | Get-SplattedRunbook
 
                 for ($i = 0; $i -lt $Actual.Count; $i++) {
                     $Actual[$i] | Should Be $Expected[$i]   
@@ -186,15 +186,15 @@ try {
                     '    Name = #mandatory',
                     '}',
                     '',
-                    'Get-SplattedCommand @Params',
+                    'Get-SplattedRunbook @Params',
                     '$Params = @{'
                     '    Name = #mandatory',
                     '}',
                     '',
-                    'Get-SplattedCommand @Params'
+                    'Get-SplattedRunbook @Params'
                 )
 
-                $Actual = 'Get-SplattedCommand', 'Get-SplattedCommand' | Get-SplattedCommand
+                $Actual = 'Get-SplattedRunbook', 'Get-SplattedRunbook' | Get-SplattedRunbook
 
                 for ($i = 0; $i -lt $Actual.Count; $i++) {
                     $Actual[$i] | Should Be $Expected[$i]   
@@ -207,10 +207,10 @@ try {
                     '    Name = #mandatory',
                     '}',
                     '',
-                    'Get-SplattedCommand @SplattParams'
+                    'Get-SplattedRunbook @SplattParams'
                 )
 
-                $Actual =  [pscustomobject]@{Name = 'Get-SplattedCommand'; HashTableName = 'SplattParams'} | Get-SplattedCommand
+                $Actual =  [pscustomobject]@{Name = 'Get-SplattedRunbook'; HashTableName = 'SplattParams'} | Get-SplattedRunbook
 
                 for ($i = 0; $i -lt $Actual.Count; $i++) {
                     $Actual[$i] | Should Be $Expected[$i]   
@@ -223,15 +223,15 @@ try {
                     '    Name = #mandatory',
                     '}',
                     '',
-                    'Get-SplattedCommand @SplattParams',
+                    'Get-SplattedRunbook @SplattParams',
                     '$SplattParams2 = @{'
                     '    Name = #mandatory',
                     '}',
                     '',
-                    'Get-SplattedCommand @SplattParams2'
+                    'Get-SplattedRunbook @SplattParams2'
                 )
 
-                $Actual =  [pscustomobject]@{Name = 'Get-SplattedCommand'; HashTableName = 'SplattParams'}, [pscustomobject]@{Name = 'Get-SplattedCommand'; HashTableName = 'SplattParams2'}| Get-SplattedCommand
+                $Actual =  [pscustomobject]@{Name = 'Get-SplattedRunbook'; HashTableName = 'SplattParams'}, [pscustomobject]@{Name = 'Get-SplattedRunbook'; HashTableName = 'SplattParams2'}| Get-SplattedRunbook
 
                 for ($i = 0; $i -lt $Actual.Count; $i++) {
                     $Actual[$i] | Should Be $Expected[$i]   
@@ -244,16 +244,16 @@ try {
                     '    Name = #mandatory',
                     '}',
                     '',
-                    '$Result = Get-SplattedCommand @SplattParams'
+                    '$Result = Get-SplattedRunbook @SplattParams'
                 )
 
                 $Pipe = [pscustomobject]@{
-                    Name = 'Get-SplattedCommand'
+                    Name = 'Get-SplattedRunbook'
                     HashTableName = 'SplattParams'
                     AssignmentVariableName = 'Result'
                 }                        
 
-                $Actual = $Pipe | Get-SplattedCommand
+                $Actual = $Pipe | Get-SplattedRunbook
 
                 for ($i = 0; $i -lt $Actual.Count; $i++) {
                     $Actual[$i] | Should Be $Expected[$i]   
@@ -266,18 +266,18 @@ try {
                     '    Name = #mandatory',
                     '}',
                     '',
-                    '$Result1 = Get-SplattedCommand @SplattParams1',
+                    '$Result1 = Get-SplattedRunbook @SplattParams1',
                     '$SplattParams2 = @{'
                     '    Name = #mandatory',
                     '}',
                     '',
-                    '$Result2 = Get-SplattedCommand @SplattParams2'
+                    '$Result2 = Get-SplattedRunbook @SplattParams2'
                 )
 
-                $Pipe = [pscustomobject]@{Name = 'Get-SplattedCommand'; HashTableName = 'SplattParams1'; AssignmentVariableName = 'Result1'}, 
-                        [pscustomobject]@{Name = 'Get-SplattedCommand'; HashTableName = 'SplattParams2'; AssignmentVariableName = 'Result2'}
+                $Pipe = [pscustomobject]@{Name = 'Get-SplattedRunbook'; HashTableName = 'SplattParams1'; AssignmentVariableName = 'Result1'}, 
+                        [pscustomobject]@{Name = 'Get-SplattedRunbook'; HashTableName = 'SplattParams2'; AssignmentVariableName = 'Result2'}
 
-                $Actual = $Pipe | Get-SplattedCommand
+                $Actual = $Pipe | Get-SplattedRunbook
 
                 for ($i = 0; $i -lt $Actual.Count; $i++) {
                     $Actual[$i] | Should Be $Expected[$i]   
