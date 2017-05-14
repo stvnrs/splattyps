@@ -13,16 +13,16 @@ Generate a splatted command invocation for the specified command.
 
 ### Regular (Default)
 ```
-Get-SplattedCommand [-Name] <String> [-HashTableName <String>] [-ParameterSet <String>] [-AllParameters]
- [-IncludeCommonParameters] [-EmitScriptBlock] [-ShowTypeHint] [-ILoveSemiColons] [-IndentSize <Int32>]
- [-IndentLevel <Int32>] [-UseTabs] [-ResolveAlias] [-AssignmentVariableName <String>] [<CommonParameters>]
+Get-SplattedCommand [-Name] <String[]> [[-HashTableName] <String>] [-AssignmentVariableName <String>]
+ [-AllParameters] [-IncludeCommonParameters] [-EmitScriptBlock] [-ShowTypeHint] [-ILoveSemiColons]
+ [-IndentSize <Int32>] [-IndentLevel <Int32>] [-UseTabs] [-ResolveAlias] [-ParameterSet <String>]  [<CommonParameters>]
 ```
 
 ### Compact
 ```
-Get-SplattedCommand [-Name] <String> [-HashTableName <String>] [-ParameterSet <String>] [-AllParameters]
- [-IncludeCommonParameters] [-EmitScriptBlock] [-CompactHashTable] [-ILoveSemiColons] [-IndentSize <Int32>]
- [-IndentLevel <Int32>] [-UseTabs] [-ResolveAlias] [-AssignmentVariableName <String>] [<CommonParameters>]
+Get-SplattedCommand [-Name] <String[]> [[-HashTableName] <String>] [-AssignmentVariableName <String>]
+ [-AllParameters] [-IncludeCommonParameters] [-EmitScriptBlock] [-CompactHashTable] [-ILoveSemiColons]
+ [-IndentSize <Int32>] [-IndentLevel <Int32>] [-UseTabs] [-ResolveAlias] [-ParameterSet <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -192,7 +192,7 @@ Aliases: avn
 Required: False
 Position: Named
 Default value: None
-Accept pipeline input: False
+Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
@@ -204,7 +204,7 @@ Type: SwitchParameter
 Parameter Sets: Compact
 Aliases: c
 
-Required: False
+Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -235,9 +235,9 @@ Parameter Sets: (All)
 Aliases: htn
 
 Required: False
-Position: Named
+Position: 1
 Default value: None
-Accept pipeline input: False
+Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
@@ -305,7 +305,7 @@ Accept wildcard characters: False
 Name of the command.
 
 ```yaml
-Type: String
+Type: String[]
 Parameter Sets: (All)
 Aliases: 
 
@@ -315,7 +315,6 @@ Default value: None
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```
-
 ### -ParameterSet
 The parameter set to use.
 
