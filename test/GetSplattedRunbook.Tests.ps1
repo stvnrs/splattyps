@@ -14,54 +14,39 @@ try {
             Mock -CommandName Get-AzureRmAutomationRunbook -MockWith {
                 Write-Verbose "Name: $Name" -Verbose        
                 
+                $Runbook = [PSCustomObject]@{
+                    Location              = 'West Europe'
+                    Tags                  = @{}
+                    RunbookType           = 'PowerShell'
+                    Parameters            = @{}
+                    LogVerbose            = $False
+                    LogProgress           = $False
+                    LastModifiedBy        = 'user@example.com'
+                    State                 = 'Published'
+                    ResourceGroupName     = $ResourceGroupName
+                    AutomationAccountName = $AutomationAccountName
+                    Name                  = $Name
+                    CreationTime          = (Get-Date -Year 2017 -Month 4 -Day 1)
+                    LastModifiedTime      = (Get-Date -Year 2017 -Month 4 -Day 1)
+                    Description           = 'lorem ipsum'
+                }
+
                 if ($Name -eq 'RunbookWithParams') {
-                    return [PSCustomObject]@{
-                        Location              = 'West Europe'
-                        Tags                  = @{}
-                        RunbookType           = 'PowerShell'
-                        Parameters            = @{
-                            MandatoryParam = [PSCustomObject]@{
-                                Position    = 1
-                                IsMandatory = $true
-                                Type        = [System.String]
-                            }
-                            OptionalParam  = [PSCustomObject]@{
-                                Position    = 2
-                                IsMandatory = $false
-                                Type        = [System.Int32]
-                            }
+                    $Runbook.Parameters = @{
+                        MandatoryParam = [PSCustomObject]@{
+                            Position    = 1
+                            IsMandatory = $true
+                            Type        = [System.String]
                         }
-                        LogVerbose            = $False
-                        LogProgress           = $False
-                        LastModifiedBy        = 'user@example.com'
-                        State                 = 'Published'
-                        ResourceGroupName     = 'example-resource-group'
-                        AutomationAccountName = 'example-automation-account'
-                        Name                  = $Name
-                        CreationTime          = (Get-Date -Year 2017 -Month 4 -Day 1)
-                        LastModifiedTime      = (Get-Date -Year 2017 -Month 4 -Day 1)
-                        Description           = 'lorem ipsum'
+                        OptionalParam  = [PSCustomObject]@{
+                            Position    = 2
+                            IsMandatory = $false
+                            Type        = [System.Int32]
+                        }
                     }
                 }
 
-                if ($Name -eq 'RunbookWithNoParams') {
-                    return [PSCustomObject]@{
-                        Location              = 'West Europe'
-                        Tags                  = @{}
-                        RunbookType           = 'PowerShell'
-                        Parameters            = @{}
-                        LogVerbose            = $False
-                        LogProgress           = $False
-                        LastModifiedBy        = 'user@example.com'
-                        State                 = 'Published'
-                        ResourceGroupName     = 'example-resource-group'
-                        AutomationAccountName = 'example-automation-account'
-                        Name                  = $Name
-                        CreationTime          = (Get-Date -Year 2017 -Month 4 -Day 1)
-                        LastModifiedTime      = (Get-Date -Year 2017 -Month 4 -Day 1)
-                        Description           = 'lorem ipsum'
-                    }
-                }
+                return $Runbook     
             }
 
             It "When called with a positonal args returns only mandatory params RunbookWithParams" {
