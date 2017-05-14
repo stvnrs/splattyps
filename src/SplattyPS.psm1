@@ -222,6 +222,9 @@ function Get-SplattedRunbook {
         [Parameter(Mandatory = $False, Position = 2)]
         [ValidateNotNullOrEmpty()]        
         [string]$Name,
+
+        [Alias('All')]
+        [switch]$AllParameters,
         
         [Parameter(Mandatory = $False)]
         [ValidateNotNullOrEmpty()]        
@@ -310,33 +313,43 @@ function Get-SplattedRunbook {
 
             $Parameters = $Rb.Parameters.GetEnumerator() |   Sort-Object {$_.Value.Position} 
 
+            $MaxLength = 0
+
+            foreach ($Parameter in $Parameters) {
+                if ($AllParameters.IsPresent -or $Parameter.Value.IsMandatory) {
+                    $MaxLength = [Math]::Max($Parameter.Name.Length, $MaxLength)
+                }
+            }
+
+            $MaxLength = $MaxLength + ($MaxLength % 4)
             
             foreach ($Parameter in $Parameters) {
-               
-                if ($Parameter.Value.IsMandatory) {
-                    $MandatoryComment = '#mandatory'
-                }
-                else {
-                    $MandatoryComment = '#optional'
-                }
+               if ($AllParameters.IsPresent -or $Parameter.Value.IsMandatory) {
+                    if ($Parameter.Value.IsMandatory) {
+                        $MandatoryComment = '#mandatory'
+                    }
+                    else {
+                        $MandatoryComment = '#optional'
+                    }
 
-                if ($ShowTypeHint.IsPresent) {
-                    $TypeHint = $Parameter.Value.Type.ToString()
-                } 
-                else {
-                    $TypeHint = ''
-                }
+                    if ($ShowTypeHint.IsPresent) {
+                        $TypeHint = ' ' + $Parameter.Value.Type.ToString()
+                    } 
+                    else {
+                        $TypeHint = ''
+                    }
                     
-                $x = ' ' * (30 - $Parameter.Key.Length)
-                $Output += "$($Indent * $IndentLevel)$($Parameter.Key) = $LineEnding$($x) $mandatoryComment $TypeHint"
-                
+                    $x = ' ' * ($MaxLength - $Parameter.Key.Length)
+                    $Output += "$($Indent * $IndentLevel)$($Parameter.Key) = $LineEnding$($x)$mandatoryComment$TypeHint"
+                }
             }
 
             $IndentLevel--
             $Output += "$($Indent * $IndentLevel)}"
             $IndentLevel--
 
-            $Output += "$($Indent * $IndentLevel)}`r`n`r`n"
+            $Output += "$($Indent * $IndentLevel)}"
+            $Output += ''
             $Output += "$($Indent * $IndentLevel)`$Job = Start-AzureRmAutomationRunbook @$($HashTableName)$($LineEnding)$(if($Wait.IsPresent){' -Wait'})"
 
             if ($EmitScriptBlock.IsPresent) {
