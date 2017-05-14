@@ -208,3 +208,143 @@ function Get-SplattedCommand {
         }
     }
 }
+
+function Get-SplattedRunbook {
+    param (
+        [Parameter(Mandatory = $true, Position = 0)]
+        [ValidateNotNullOrEmpty()]        
+        [string]$ResourceGroupName,
+
+        [Parameter(Mandatory = $true, Position = 1)]
+        [ValidateNotNullOrEmpty()]        
+        [string]$AutomationAccountName,
+
+        [Parameter(Mandatory = $False, Position = 2)]
+        [ValidateNotNullOrEmpty()]        
+        [string]$Name,
+        
+        [Parameter(Mandatory = $False)]
+        [ValidateNotNullOrEmpty()]        
+        [string]$TagName,
+        
+        [Parameter(Mandatory = $False)]
+        [ValidateNotNullOrEmpty()]        
+        [string]$TagValue,
+
+        [Alias('w')]
+        [switch]$Wait,
+
+        [ValidateNotNullOrEmpty()]
+        [Parameter(Mandatory = $false)]
+        [Alias('htn')]
+        [string]$HashTableName = 'Params',
+                    
+        [Alias('esb')]
+        [switch]$EmitScriptBlock,
+        
+        [Alias('sth')]
+        [switch]$ShowTypeHint,
+
+        [Alias('ILoveSemis')]
+        [switch]$ILoveSemiColons,
+
+        [Alias('is')]
+        [int]$IndentSize = 4,
+
+        [Alias('il')]
+        [int]$IndentLevel = 0
+    )
+
+    process {
+        if ($PSBoundParameters.ContainsKey('Name')) {
+            $Runbook = Get-AzureRmAutomationRunbook -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutomationAccountName -Name $Name
+        }
+        else {
+            $Runbook = Get-AzureRmAutomationRunbook -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutomationAccountName
+
+            if ($PSBoundParameters.ContainsKey('TagName') ) {
+                $Runbook = $Runbook | % {
+                    $rb = $_ | Get-AzureRmAutomationRunbook 
+    
+                    Write-Verbose "Checking $($rb.name)" -Verbose
+
+                    if ( $Rb.Tags.ContainsKey($TagName)) {
+                        if (-not $PSBoundParameters.ContainsKey('TagValue')) {
+                            $rb 
+                        }
+                        elseif ($Rb.Tags[$TagName] -eq $TagValue) {
+                            $Rb
+                        }
+                    }
+                } 
+            }
+        }
+
+        $Runbook | ForEach-Object {
+            $Rb = $_ | Get-AzureRmAutomationRunbook
+
+            $Indent = ' ' * $IndentSize
+        
+            if ($ILoveSemiColons.IsPresent) {
+                $LineEnding = ';'
+            } 
+            else {
+                $LineEnding = ''
+            }
+
+            $Output = @()
+            
+            if ($EmitScriptBlock.IsPresent) {
+                $Output += "$($Indent * $IndentLevel)Invoke-Command {"
+                $IndentLevel++
+            }        
+            $Output += "$($Indent * $IndentLevel)`$$HashTableName = @{"
+            $IndentLevel++       
+
+            $Output += "$($Indent * $IndentLevel)ResourceGroupName = '$ResourceGroupName'"
+            $Output += "$($Indent * $IndentLevel)AutomationAccountName = '$AutomationAccountName'"
+            $Output += "$($Indent * $IndentLevel)Name = '$($Rb.Name)'"
+            $Output += "$($Indent * $IndentLevel)Parameters = @{"
+            $IndentLevel++
+
+
+            $Parameters = $Rb.Parameters.GetEnumerator() |   Sort-Object {$_.Value.Position} 
+
+            
+            foreach ($Parameter in $Parameters) {
+               
+                if ($Parameter.Value.IsMandatory) {
+                    $MandatoryComment = '#mandatory'
+                }
+                else {
+                    $MandatoryComment = '#optional'
+                }
+
+                if ($ShowTypeHint.IsPresent) {
+                    $TypeHint = $Parameter.Value.Type.ToString()
+                } 
+                else {
+                    $TypeHint = ''
+                }
+                    
+                $x = ' ' * (30 - $Parameter.Key.Length)
+                $Output += "$($Indent * $IndentLevel)$($Parameter.Key) = $LineEnding$($x) $mandatoryComment $TypeHint"
+                
+            }
+
+            $IndentLevel--
+            $Output += "$($Indent * $IndentLevel)}"
+            $IndentLevel--
+
+            $Output += "$($Indent * $IndentLevel)}`r`n`r`n"
+            $Output += "$($Indent * $IndentLevel)`$Job = Start-AzureRmAutomationRunbook @$($HashTableName)$($LineEnding)$(if($Wait.IsPresent){' -Wait'})"
+
+            if ($EmitScriptBlock.IsPresent) {
+                $IndentLevel--
+                $Output += "$($Indent * $IndentLevel)}"
+            }
+
+            Write-Output $Output        
+        }    
+    }
+}
