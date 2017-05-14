@@ -55,7 +55,6 @@ function Get-SplattedCommand {
         $ParameterName = "ParameterSet"        
 
         if ($PSBoundParameters.ContainsKey('Name')) {
-            
             if ($PSBoundParameters['Name'].Length -eq 1) {
                 $Command = (Get-Command $Name)
 
@@ -109,102 +108,103 @@ function Get-SplattedCommand {
         $Assignment = ''
     }   
 
-    process {
-        $Name 
-        $Command = (Get-Command $Name)
+    process {        
+        $Name | ForEach-Object {
+            $Command = (Get-Command $Name)
 
-        if ($Command.CommandType -eq 'Alias') {
-            $Command = (Get-Command $Command.Definition)
-            if ($ResolveAlias.IsPresent) {
-                $Name = $Command.Name
+            if ($Command.CommandType -eq 'Alias') {
+                $Command = (Get-Command $Command.Definition)
+                if ($ResolveAlias.IsPresent) {
+                    $Name = $Command.Name
+                }
             }
-        }
 
-        $DefaultParameterSet = $PSBoundParameters["ParameterSet"]
-        
-        if (!$DefaultParameterSet) {
-            $DefaultParameterSet = $Command.DefaultParameterSet
-        }
-    
-        if (!$DefaultParameterSet) {
-            $DefaultParameterSet = "__AllParameterSets"
-        }
-
-        Write-Verbose "DefaultParameterSet = $DefaultParameterSet"
-          
-        $Output = @()
-        
-        if ($AssignmentVariableName) {
-            $Assignment = "`$$AssignmentVariableName = "
-        }
-
-        if ($EmitScriptBlock.IsPresent) {
-            $Output += "$($Indent * $IndentLevel)Invoke-Command {"
-            $IndentLevel++
-        }   
-
-        $IndentLevel++       
-        
-        $MaxLength = 0
-
-        ($Command.ParameterSets | Where-Object Name -eq $DefaultParameterSet).Parameters | ForEach-Object {        
-            if ($AllParameters.IsPresent -or $_.IsMandatory) {
-                $MaxLength = [math]::Max($_.Name.Length, $MaxLength)
+            $DefaultParameterSet = $PSBoundParameters["ParameterSet"]
+            
+            if (!$DefaultParameterSet) {
+                $DefaultParameterSet = $Command.DefaultParameterSet
             }
-        }                    
-
-        $MaxLength = $MaxLength + ($MaxLength % 4)
         
-        $ParamsOutput = @()
-        
-        ($Command.ParameterSets | Where-Object Name -eq $DefaultParameterSet).Parameters | ForEach-Object {
-            if ($AllParameters.IsPresent -or $_.IsMandatory) {
-                if ($_.IsMandatory) {
-                    $MandatoryComment = 'mandatory'
-                }
-                else {
-                    $MandatoryComment = 'optional'
-                }
+            if (!$DefaultParameterSet) {
+                $DefaultParameterSet = "__AllParameterSets"
+            }
 
-                if ($ShowTypeHint.IsPresent) {
-                    $TypeHint = $_.ParameterType.ToString()
-                } 
-                else {
-                    $TypeHint = ''
-                }
+            Write-Verbose "DefaultParameterSet = $DefaultParameterSet"
+            
+            $Output = @()
+            
+            if ($AssignmentVariableName) {
+                $Assignment = "`$$AssignmentVariableName = "
+            }
 
-                if ($IncludeCommonParameters -or $_.Name -inotin $CommonParamNames) {
-                    $x = ' ' * ($MaxLength - $_.Name.Length)
-                    $Param = "$($_.Name) = $LineEnding"
-                    
-                    if (-not $CompactHashTable.IsPresent) {            
-                        $Param = "$($Indent * $IndentLevel)$Param$($x)#$mandatoryComment $TypeHint"
+            if ($EmitScriptBlock.IsPresent) {
+                $Output += "$($Indent * $IndentLevel)Invoke-Command {"
+                $IndentLevel++
+            }   
+
+            $IndentLevel++       
+            
+            $MaxLength = 0
+
+            ($Command.ParameterSets | Where-Object Name -eq $DefaultParameterSet).Parameters | ForEach-Object {        
+                if ($AllParameters.IsPresent -or $_.IsMandatory) {
+                    $MaxLength = [math]::Max($_.Name.Length, $MaxLength)
+                }
+            }                    
+
+            $MaxLength = $MaxLength + ($MaxLength % 4)
+            
+            $ParamsOutput = @()
+            
+            ($Command.ParameterSets | Where-Object Name -eq $DefaultParameterSet).Parameters | ForEach-Object {
+                if ($AllParameters.IsPresent -or $_.IsMandatory) {
+                    if ($_.IsMandatory) {
+                        $MandatoryComment = 'mandatory'
                     }
-     
-                    $ParamsOutput += $Param                    
-                }
-            }    
-        }
-        
-        $IndentLevel--
-        
-        if ($CompactHashTable.IsPresent) {
-            $Output += "$($Indent * $IndentLevel)`$$HashTableName = @{$([string]::join(';  ', $ParamsOutput));}";
-        } 
-        else {
-            $Output += "$($Indent * $IndentLevel)`$$HashTableName = @{"
-            $Output += $ParamsOutput;
-            $Output += "$($Indent * $IndentLevel)}"
-        }
-       
-        $Output += ''
-        $Output += "$($Indent * $IndentLevel)$Assignment$($name) @$($HashTableName)$($LineEnding)"
+                    else {
+                        $MandatoryComment = 'optional'
+                    }
 
-        if ($EmitScriptBlock.IsPresent) {
+                    if ($ShowTypeHint.IsPresent) {
+                        $TypeHint = ' ' + $_.ParameterType.ToString()
+                    } 
+                    else {
+                        $TypeHint = ''
+                    }
+
+                    if ($IncludeCommonParameters -or $_.Name -inotin $CommonParamNames) {
+                        $x = ' ' * ($MaxLength - $_.Name.Length)
+                        $Param = "$($_.Name) = $LineEnding"
+                        
+                        if (-not $CompactHashTable.IsPresent) {            
+                            $Param = "$($Indent * $IndentLevel)$Param$($x)#$mandatoryComment$TypeHint"
+                        }
+        
+                        $ParamsOutput += $Param                    
+                    }
+                }    
+            }
+            
             $IndentLevel--
-            $Output += "$($Indent * $IndentLevel)}"
-        }
+            
+            if ($CompactHashTable.IsPresent) {
+                $Output += "$($Indent * $IndentLevel)`$$HashTableName = @{$([string]::join(';  ', $ParamsOutput));}";
+            } 
+            else {
+                $Output += "$($Indent * $IndentLevel)`$$HashTableName = @{"
+                $Output += $ParamsOutput;
+                $Output += "$($Indent * $IndentLevel)}"
+            }
+        
+            $Output += ''
+            $Output += "$($Indent * $IndentLevel)$Assignment$($name) @$($HashTableName)$($LineEnding)"
 
-        Write-Output $Output    
+            if ($EmitScriptBlock.IsPresent) {
+                $IndentLevel--
+                $Output += "$($Indent * $IndentLevel)}"
+            }
+
+            Write-Output $Output    
+        }
     }
 }
